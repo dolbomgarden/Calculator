@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>조경자재 수량계산기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #2E7D32;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .material-info {
+            background: linear-gradient(135deg, #E8F5E8, #F1F8E9);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .material-info h3 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .material-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #C8E6C9;
+        }
+
+        .material-item:last-child {
+            border-bottom: none;
+        }
+
+        .material-name {
+            font-weight: 600;
+            color: #2E7D32;
+        }
+
+        .material-ratio {
+            font-size: 0.9em;
+            color: #666;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px 0;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            border-radius: 15px;
+            color: white;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result-header {
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .result-detail {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+
+        .final-result {
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: 800;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .clear-btn {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .clear-btn:hover {
+            background: white;
+            color: #4CAF50;
+            transform: translateY(-1px);
+        }
+
+        .unit {
+            color: #888;
+            font-size: 0.9em;
+            margin-left: 5px;
+        }
+
+        @media (max-width: 480px) {
+            .calculator-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            select, input[type="number"], .calculate-btn {
+                font-size: 1em;
+            }
+
+            .final-result {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <h1>🏗️ 조경자재 수량계산기</h1>
+        <p class="subtitle">시공 면적과 두께에 따른 필요 포대수를 계산해보세요</p>
+        
+        <div class="material-info">
+            <h3>📋 자재별 계수표</h3>
+            <div class="material-item">
+                <span class="material-name">자갈</span>
+                <span class="material-ratio">1㎡ × 1cm = 1포대</span>
+            </div>
+            <div class="material-item">
+                <span class="material-name">화산송이석</span>
+                <span class="material-ratio">1㎡ × 1cm = 1.5포대</span>
+            </div>
+            <div class="material-item">
+                <span class="material-name">모래류</span>
+                <span class="material-ratio">1㎡ × 1cm = 1포대</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="material">자재 선택</label>
+            <select id="material">
+                <option value="">자재를 선택해주세요</option>
+                <option value="gravel">자갈 (1㎡×1cm = 1포대)</option>
+                <option value="volcanic">화산송이석 (1㎡×1cm = 1.5포대)</option>
+                <option value="sand">모래류 (1㎡×1cm = 1포대)</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label for="area">시공 면적 <span class="unit">(㎡)</span></label>
+            <input type="number" id="area" placeholder="시공할 면적을 입력하세요" min="0" step="0.1">
+        </div>
+        
+        <div class="input-group">
+            <label for="thickness">시공 두께 <span class="unit">(cm)</span></label>
+            <input type="number" id="thickness" placeholder="시공할 두께를 입력하세요" min="0" step="0.1">
+        </div>
+        
+        <button class="calculate-btn" onclick="calculateQuantity()">수량 계산하기</button>
+        
+        <div class="result-section" id="resultSection">
+            <div class="result-header">📦 계산 결과</div>
+            
+            <div class="result-detail">
+                <div class="result-item">
+                    <span class="result-label">선택 자재</span>
+                    <span class="result-value" id="selectedMaterial">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">시공 면적</span>
+                    <span class="result-value" id="calculatedArea">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">시공 두께</span>
+                    <span class="result-value" id="calculatedThickness">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">적용 계수</span>
+                    <span class="result-value" id="appliedRatio">-</span>
+                </div>
+            </div>
+            
+            <div class="final-result" id="finalQuantity">
+                0 포대
+            </div>
+            
+            <button class="clear-btn" onclick="clearAll()">다시 계산하기</button>
+        </div>
+    </div>
+
+    <script>
+        // 자재별 계수 정의
+        const materialRatios = {
+            'gravel': { name: '자갈', ratio: 1.0 },
+            'volcanic': { name: '화산송이석', ratio: 1.5 },
+            'sand': { name: '모래류', ratio: 1.0 }
+        };
+
+        // 숫자를 소수점 처리하는 함수
+        function formatNumber(num) {
+            return Math.ceil(num * 10) / 10; // 소수점 첫째자리에서 올림
+        }
+
+        // 계산 함수
+        function calculateQuantity() {
+            const materialType = document.getElementById('material').value;
+            const area = parseFloat(document.getElementById('area').value) || 0;
+            const thickness = parseFloat(document.getElementById('thickness').value) || 0;
+
+            // 입력값 검증
+            if (!materialType) {
+                alert('자재를 선택해주세요!');
+                return;
+            }
+
+            if (area <= 0) {
+                alert('시공 면적을 올바르게 입력해주세요!');
+                return;
+            }
+
+            if (thickness <= 0) {
+                alert('시공 두께를 올바르게 입력해주세요!');
+                return;
+            }
+
+            // 계산 수행
+            const material = materialRatios[materialType];
+            const totalQuantity = area * thickness * material.ratio;
+            const roundedQuantity = Math.ceil(totalQuantity); // 포대는 정수로 올림
+
+            // 결과 표시
+            document.getElementById('selectedMaterial').textContent = material.name;
+            document.getElementById('calculatedArea').textContent = area + ' ㎡';
+            document.getElementById('calculatedThickness').textContent = thickness + ' cm';
+            document.getElementById('appliedRatio').textContent = material.ratio + ' 포대/㎡·cm';
+            document.getElementById('finalQuantity').textContent = roundedQuantity + ' 포대';
+
+            // 결과 섹션 표시
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // 결과 섹션으로 부드럽게 스크롤
+            document.getElementById('resultSection').scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
+
+        // 초기화 함수
+        function clearAll() {
+            document.getElementById('material').value = '';
+            document.getElementById('area').value = '';
+            document.getElementById('thickness').value = '';
+            document.getElementById('resultSection').style.display = 'none';
+            
+            // 첫 번째 선택 필드로 포커스
+            document.getElementById('material').focus();
+        }
+
+        // Enter 키로 계산하기
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateQuantity();
+            }
+        });
+
+        // 페이지 로드 시 첫 번째 선택 필드에 포커스
+        window.onload = function() {
+            document.getElementById('material').focus();
+        };
+
+        // 실시간 입력 검증
+        document.getElementById('area').addEventListener('input', function(e) {
+            if (e.target.value < 0) e.target.value = 0;
+        });
+
+        document.getElementById('thickness').addEventListener('input', function(e) {
+            if (e.target.value < 0) e.target.value = 0;
+        });
+
+        // 자재 선택 시 안내 메시지
+        document.getElementById('material').addEventListener('change', function(e) {
+            if (e.target.value) {
+                const material = materialRatios[e.target.value];
+                console.log(`${material.name} 선택됨 - 계수: ${material.ratio}`);
+            }
+        });
+    </script>
+</body>
+</html>
